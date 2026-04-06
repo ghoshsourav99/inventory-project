@@ -41,6 +41,10 @@ getProducts();
   }
 
   const updateProduct = (id, quantity) => {
+    if (quantity < 0) {
+      alert("Quantity cannot be negative");
+      return;
+    }
     axios.put("http://localhost:3001/update", {
       id: id,
       quantity: quantity,
@@ -55,28 +59,37 @@ getProducts();
       <h1>Inventory Management System</h1>
 
       <div className="form">
-        <label>Product Name: </label>
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
+        <div className="form-group">
+          <label>Product Name</label>
+          <input
+            type="text"
+            value={name}
+            placeholder="e.g. Laptop"
+            onChange={(e) => setName(e.target.value)}
+          />
+        </div>
 
-        <label>Quantity: </label>
-        <input
-          type="number"
-          value={quantity}
-          onChange={(e) => setQuantity(parseInt(e.target.value))}
-        />
+        <div className="form-group">
+          <label>Quantity</label>
+          <input
+            type="number"
+            value={quantity}
+            onChange={(e) => setQuantity(parseInt(e.target.value))}
+          />
+        </div>
 
-        <label>Price: </label>
-        <input
-          type="number"
-          value={price}
-          onChange={(e) => setPrice(parseFloat(e.target.value))}
-        />
+        <div className="form-group">
+          <label>Price ($)</label>
+          <input
+            type="number"
+            value={price}
+            onChange={(e) => setPrice(parseFloat(e.target.value))}
+          />
+        </div>
 
-        <button onClick={submitProduct}>Submit</button>
+        <button className="btn-add" onClick={submitProduct}>
+          Add Product
+        </button>
       </div>
 
       <h2>Product List</h2>
@@ -91,16 +104,18 @@ getProducts();
           </tr>
         </thead>
         <tbody>
-          {products.map((product) => (
+          {products.map((product, index ) => (
             <tr key={product.id}>
-              <td>{product.id}</td>
+              <td>{index + 1}</td>
               <td>{product.name}</td>
-              <td>{product.quantity}</td>
-              <td>
-                ${product.price} (Total: ${product.price * product.quantity})
-              </td>{" "}
+              {/* Visual Cue: If quantity < 5, apply 'low-stock' class */}
+              <td className={product.quantity < 5 ? "low-stock" : ""}>
+                {product.quantity} {product.quantity < 5 && "(Low!)"}
+              </td>
+              <td>${Number(product.price).toFixed(2)}</td>
               <td>
                 <button
+                  className="btn-qty"
                   onClick={() =>
                     updateProduct(product.id, product.quantity + 1)
                   }
@@ -108,13 +123,17 @@ getProducts();
                   +
                 </button>
                 <button
+                  className="btn-qty"
                   onClick={() =>
                     updateProduct(product.id, product.quantity - 1)
                   }
                 >
                   -
                 </button>
-                <button onClick={() => deleteProduct(product.id)}>
+                <button
+                  className="btn-delete"
+                  onClick={() => deleteProduct(product.id)}
+                >
                   Delete
                 </button>
               </td>
